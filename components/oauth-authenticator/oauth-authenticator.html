@@ -1,0 +1,115 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<link rel="import" href="../google-apis/google-apis.html">
+
+<!--
+The `oauth-authenticator` element provides an authentication service for polymer 
+apps that wish to use OAuth 2.0
+
+##### Example
+
+    <oauth-authenticator></oauth-authenticator>
+
+@element oauth-authenticator
+@blurb Element providing solution to OAuth 2.0 authentication for polymer apps
+@status alpha
+@homepage https://.../oauth-authenticator
+-->
+
+<polymer-element name="oauth-authenticator" attributes="client_id scopes">
+  <template>
+    <link rel="stylesheet" href="oauth-authenticator.css">
+    <google-client-api id="gapi" on-api-load="{{gapiLoaded}}"></google-client-api>
+  </template>
+
+  <script>
+    Polymer('oauth-authenticator', {
+      /**
+       * The `authenticated` event is fired when the authenticator has received
+       * confirmation from the api and has tokens to be used and fired again 
+       * every token refresh
+       *
+       * @event authenticated
+       */
+
+      /**
+       * The `client_id` attribute stores the client id for the given project
+       *
+       * @attribute client_id
+       * @type string
+       */
+      client_id: '',
+      
+      /**
+       * The `scopes` attribute is a space delimited list of the request OAuth
+       * scopes
+       *
+       * @attribute scopes
+       * @type string
+       */
+      scopes: '',
+      
+      /**
+       * This function will be invoked when the Google Client API has loaded.
+       */
+      gapiLoaded: function() {
+        var options = {
+          'client_id': this.client_id,
+          'scope': this.scopes
+        };
+        authenticator(options, this);
+      }
+    });
+    
+    /**
+       * The `authenticator` method creates an encapsulated loading object for OAuth
+       *
+       * @method authenticator
+       * @param {Object} options Defines the options to be passed to Gapi.auth
+       * @param {Object} notify Defines the element to be notified of success.
+       */
+    var authenticator = function(options, notify){
+      authorize(false, verify);
+      
+      /**
+       * The `authorize` method sends an authorization request to OAuth
+       * 
+       * @method authorize
+       * @param {Boolean} prompt Defines wether or not the request should be made in immediate mode (i.e, prompt pop-up)
+       * @param {Function} verify Defines a callback function to be executed that verifies the output.
+       */
+      function authorize(prompt, verify){
+        options.immediate = !prompt;
+        gapi.auth.authorize(options,verify);
+      };
+      
+      /**
+       * The `verify` method handles an authResult and checks for any errors
+       * before either accepting or reattempting.
+       * 
+       * @method verify
+       * @param {Object} authResult Defines a return object from gapi.auth
+       */
+      function verify(authResult){
+        if(authResult && !authResult.error){
+          notify.fire('authenticated', {'token': authResult.access_token});
+          window.setTimeout(refresh, authResult.expires_in * 1000);
+        }else{
+          authorize(true, verify);
+        }
+      };
+      
+      /**
+       * The `refresh` method handles the refresh of tokens
+       * 
+       * @method refresh
+       */
+      function refresh(){
+        authorize(false, function(authResult){
+          notify.fire('authenticated', {'token': authResult.access_token});
+          window.setTimeout(refresh, authResult.expires_in * 1000);
+        });
+      };
+    }
+  </script>
+</polymer-element>

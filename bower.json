@@ -1,0 +1,7 @@
+{
+  "name": "oauth-authenticator#gh-pages",
+  "private": true,
+  "dependencies": {
+    "oauth-authenticator": "mattcooper/oauth-authenticator#master"
+  }
+}
