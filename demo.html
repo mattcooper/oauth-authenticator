@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>oauth-authenticator Demo</title>
+
+  <script src="../platform/platform.js"></script>
+  <link rel="import" href="oauth-authenticator.html">
+  <link rel="import" href="../core-ajax/core-ajax.html">
+</head>
+
+<body unresolved>
+  <h2>OAuth 2.0 Authenticator Demo</h2>
+  <p>This demo shows an OAuth authentication for the userinfo api</p>
+  <p id="infobox"></p>
+
+  <oauth-user></oauth-user>
+  
+  <polymer-element name="oauth-user">
+    <template>
+        <oauth-authenticator id="authenticator" client_id="282331888208-06mufq54k942624lv803nlm6kvlq76fr.apps.googleusercontent.com" scopes="https://www.googleapis.com/auth/userinfo.profile" on-authenticated="{{authenticated}}"></oauth-authenticator>
+        <core-ajax auto id="ajax" url="{{url}}" headers="{{headers}}" handleAs="json" on-core-response="{{ajaxResponse}}"></core-ajax>
+        <p>{{greeting}}</p>
+    </template>
+    <script>
+        Polymer({
+            url: '',
+            greeting: '...',
+          
+            authenticated: function(event){
+              var token = event.detail.token;
+              this.headers = {'Authorization': 'Bearer ' + token};
+              this.url = "https://www.googleapis.com/oauth2/v1/userinfo?alt=json";
+            },
+          
+            ajaxResponse: function(event, response) {
+              this.greeting = 'Hello ' + response.response.name + '!';
+            }
+        });
+    </script>
+  </polymer-element>
+
+</body>
+</html>

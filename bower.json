@@ -1,0 +1,16 @@
+{
+  "name": "oauth-authenticator",
+  "version": "0.0.1",
+  "authors": [
+    "Matt Cooper <cooperm@google.com>"
+  ],
+  "homepage": "http://mattcooper.github.io/oauth-authenticator",
+  "description": "Web Componenent to authenticate with OAuth 2.0",
+  "main": "oauth-authenticator.html",
+  "license": "MIT",
+  "dependencies": {
+    "polymer": "Polymer/polymer#master",
+    "google-apis": "GoogleWebComponents/google-apis#~0.3.1",
+    "core-ajax": "Polymer/core-ajax#master"
+  }
+}
